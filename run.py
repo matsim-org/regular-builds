@@ -20,6 +20,7 @@ if os.path.exists("state.json"):
 
 # Clean up MATSim
 if os.path.exists("matsim"):
+    print("Deleting old checkout ...")
     shutil.rmtree("matsim")
 
 # Clone MATSim
