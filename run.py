@@ -1,5 +1,8 @@
-import shutil, os.path, json, datetime, re, glob, requests
+import shutil, os.path, json, datetime, re, glob, requests, os
 import subprocess as sp
+
+BINTRAY_USER = os.environ["BINTRAY_USER"]
+BINTRAY_PASSWORD = os.environ["BINTRAY_PASSWORD"]
 
 INTERNAL_DATE_FORMAT = "%Yw%W"
 VERSION_PATTERN = r"<version>(.*)</version>"
@@ -16,11 +19,11 @@ if os.path.exists("state.json"):
         state.update(json.load(f))
 
 # Clean up MATSim
-#if os.path.exists("matsim"):
-#    shutil.rmtree("matsim")
+if os.path.exists("matsim"):
+    shutil.rmtree("matsim")
 
 # Clone MATSim
-#sp.check_call(["git", "clone", "--depth", "1", "https://github.com/matsim-org/matsim.git"])
+sp.check_call(["git", "clone", "--depth", "1", "https://github.com/matsim-org/matsim.git"])
 
 # Find current commit
 current_commit = sp.check_output(["git", "rev-parse", "HEAD"], cwd = "matsim").decode("utf-8").strip()
@@ -50,17 +53,18 @@ if not current_date == last_release_date:
         print("Updated version is:", updated_version)
         print("Current commit is:", current_commit)
 
-        result = requests.get("https://api.bintray.com/packages/matsim-eth/matsim/matsim/versions/_latest")
+        bintray_auth = requests.auth.HTTPBasicAuth(BINTRAY_USER, BINTRAY_PASSWORD)
+        result = requests.get("https://api.bintray.com/packages/matsim-eth/matsim/matsim", auth = bintray_auth)
 
         if not result.status_code == 200:
             raise RuntimeError("Could not get informaton from Bintray")
 
         result = result.json()
 
-        if not "name" in result:
+        if not "versions" in result:
             raise RuntimeError("Did not understand Bintray response")
 
-        if result["name"] == updated_version:
+        if updated_version in result["versions"]:
             raise RuntimeError("Bintray already has the proposed release")
 
         for path in glob.iglob("matsim/**/pom.xml", recursive = True):
@@ -75,38 +79,32 @@ if not current_date == last_release_date:
         content = open("matsim/contribs/pom.xml").read()
         content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
 
-        #sp.check_call([
-        #    "mvn", "verify", "--batch-mode", "--fail-at-end",
-        #    "-Dmaven.test.redirectTestOutputToFile",
-        #    "-Dmatsim.preferLocalDtds=true"], cwd = "matsim")
-
         sp.check_call([
-            "mvn", "deploy", "--batch-mode", "--fail-at-end",
-            "--settings", "../settings.xml",
+            "mvn", "verify", "--batch-mode", "--fail-at-end",
             "-Dmaven.test.redirectTestOutputToFile",
             "-Dmatsim.preferLocalDtds=true"], cwd = "matsim")
 
         for item in ("matsim", "contribs", "benchmark", "examples"):
             sp.check_call([
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
-                "--settings", "../settings.xml",
+                "--settings", "../../settings.xml",
                 "-Dmaven.test.redirectTestOutputToFile",
                 "-Dmatsim.preferLocalDtds=true"], cwd = "matsim/%s" % item)
+
+        result = requests.post("https://api.bintray.com/content/matsim-eth/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
+
+        if not result.status_code == 200:
+            raise RuntimeError("Problem publishing the package")
+
+        with open("state.json", "w+") as f:
+            state["last_release_commit"] = current_commit
+            state["last_release_date"] = current_date
+            json.dump(state, f)
+
+        print("Published version:", updated_version)
     else:
         print("No changes since last release -> no new release necessary")
 else:
     print("You're too early. The day has not passed.")
-
-
-#test -e skip_build || (cd $TRAVIS_BUILD_DIR/matsim && mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end)
-
-
-
-
-
-
-
-
-
 
 #
