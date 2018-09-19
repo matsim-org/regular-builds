@@ -7,6 +7,8 @@ BINTRAY_PASSWORD = os.environ["BINTRAY_PASSWORD"]
 INTERNAL_DATE_FORMAT = "%Yw%W"
 VERSION_PATTERN = r"<version>(.*)</version>"
 
+ITEMS = ("examples", "matsim", "contribs", "benchmark")
+
 # Default values
 state = {
     "last_release_commit" : "unknown",
@@ -80,12 +82,13 @@ if not current_date == last_release_date:
         content = open("matsim/contribs/pom.xml").read()
         content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
 
-        sp.check_call([
-            "mvn", "install", "--batch-mode", "--fail-at-end",
-            "-Dmaven.test.redirectTestOutputToFile",
-            "-Dmatsim.preferLocalDtds=true"], cwd = "matsim")
+        for item in ITEMS:
+            sp.check_call([
+                "mvn", "install", "--batch-mode", "--fail-at-end",
+                "-Dmaven.test.redirectTestOutputToFile",
+                "-Dmatsim.preferLocalDtds=true"], cwd = "matsim")
 
-        for item in ("matsim", "contribs", "benchmark", "examples"):
+        for item in ITEMS:
             sp.check_call([
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
                 "--settings", "../../settings.xml",
