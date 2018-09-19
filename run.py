@@ -81,7 +81,7 @@ if not current_date == last_release_date:
         content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
 
         sp.check_call([
-            "mvn", "verify", "--batch-mode", "--fail-at-end",
+            "mvn", "install", "--batch-mode", "--fail-at-end",
             "-Dmaven.test.redirectTestOutputToFile",
             "-Dmatsim.preferLocalDtds=true"], cwd = "matsim")
 
