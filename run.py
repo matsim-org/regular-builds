@@ -94,7 +94,8 @@ if not current_date == last_release_date:
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
                 "--settings", "../../settings.xml",
                 "-Dmaven.test.redirectTestOutputToFile",
-                "-Dmatsim.preferLocalDtds=true"], cwd = "matsim/%s" % item)
+                "-Dmatsim.preferLocalDtds=true",
+                "-DskipTests=true"], cwd = "matsim/%s" % item)
 
         result = requests.post("https://api.bintray.com/content/matsim-eth/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
 
