@@ -80,8 +80,10 @@ if not current_date == last_release_date:
         print("Rewriting Bintray URLs...")
         content = open("matsim/matsim/pom.xml").read()
         content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
+        with open("matsim/matsim/pom.xml", "w+") as f: f.write(content)
         content = open("matsim/contribs/pom.xml").read()
         content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
+        with open("matsim/contribs/pom.xml", "w+") as f: f.write(content)
 
         for item in INSTALL_ITEMS:
             sp.check_call([
