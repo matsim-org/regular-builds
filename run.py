@@ -78,19 +78,23 @@ if not current_date == last_release_date:
 
         # This part can be changed later, when this moves to the official MATSim bintray
         print("Rewriting Bintray URLs...")
+
         content = open("matsim/matsim/pom.xml").read()
-        content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
+        content = content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
         with open("matsim/matsim/pom.xml", "w+") as f: f.write(content)
+
         content = open("matsim/contribs/pom.xml").read()
-        content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
+        content = content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
         with open("matsim/contribs/pom.xml", "w+") as f: f.write(content)
 
+        print("Installing maven artifacts ...")
         for item in INSTALL_ITEMS:
             sp.check_call([
                 "mvn", "install", "--batch-mode", "--fail-at-end",
                 "-Dmaven.test.redirectTestOutputToFile",
                 "-Dmatsim.preferLocalDtds=true"], cwd = "matsim")
 
+        print("Deploying maven artifacts ...")
         for item in DEPLOY_ITEMS:
             sp.check_call([
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
@@ -99,6 +103,7 @@ if not current_date == last_release_date:
                 "-Dmatsim.preferLocalDtds=true",
                 "-DskipTests=true"], cwd = "matsim/%s" % item)
 
+        print("Publishing artifacts ...")
         result = requests.post("https://api.bintray.com/content/matsim-eth/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
 
         if not result.status_code == 200:
