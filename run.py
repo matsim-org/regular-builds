@@ -58,7 +58,7 @@ if not current_date == last_release_date:
         print("Current commit is:", current_commit)
 
         bintray_auth = requests.auth.HTTPBasicAuth(BINTRAY_USER, BINTRAY_PASSWORD)
-        result = requests.get("https://api.bintray.com/packages/matsim-eth/matsim/matsim", auth = bintray_auth)
+        result = requests.get("https://api.bintray.com/packages/matsim/matsim/matsim", auth = bintray_auth)
 
         if not result.status_code == 200:
             raise RuntimeError("Could not get informaton from Bintray")
@@ -77,15 +77,15 @@ if not current_date == last_release_date:
             with open(path, "w+") as f: f.write(content)
 
         # This part can be changed later, when this moves to the official MATSim bintray
-        print("Rewriting Bintray URLs...")
+#         print("Rewriting Bintray URLs...")
 
-        content = open("matsim/matsim/pom.xml").read()
-        content = content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
-        with open("matsim/matsim/pom.xml", "w+") as f: f.write(content)
+#         content = open("matsim/matsim/pom.xml").read()
+#         content = content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
+#         with open("matsim/matsim/pom.xml", "w+") as f: f.write(content)
 
-        content = open("matsim/contribs/pom.xml").read()
-        content = content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
-        with open("matsim/contribs/pom.xml", "w+") as f: f.write(content)
+#         content = open("matsim/contribs/pom.xml").read()
+#         content = content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
+#         with open("matsim/contribs/pom.xml", "w+") as f: f.write(content)
 
         print("Installing maven artifacts ...")
         for item in INSTALL_ITEMS:
@@ -104,7 +104,7 @@ if not current_date == last_release_date:
                 "-DskipTests=true"], cwd = "matsim/%s" % item)
 
         print("Publishing artifacts ...")
-        result = requests.post("https://api.bintray.com/content/matsim-eth/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
+        result = requests.post("https://api.bintray.com/content/matsim/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
 
         if not result.status_code == 200:
             raise RuntimeError("Problem publishing the package")
