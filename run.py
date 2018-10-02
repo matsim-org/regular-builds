@@ -58,10 +58,10 @@ if not current_date == last_release_date:
         print("Current commit is:", current_commit)
 
         bintray_auth = requests.auth.HTTPBasicAuth(BINTRAY_USER, BINTRAY_PASSWORD)
-        result = requests.get("https://api.bintray.com/packages/matsim/matsim/matsim", auth = bintray_auth)
+        result = requests.get("https://api.bintray.com/packages/matsim/matsim/matsim") #, auth = bintray_auth)
 
         if not result.status_code == 200:
-            raise RuntimeError("Could not get informaton from Bintray")
+            raise RuntimeError("Could not get informaton from Bintray " + str(result.status_code))
 
         result = result.json()
 
@@ -71,10 +71,11 @@ if not current_date == last_release_date:
         if updated_version in result["versions"]:
             raise RuntimeError("Bintray already has the proposed release")
 
-        for path in glob.iglob("matsim/**/pom.xml", recursive = True):
-            print("Rewriting ", path, "...")
-            content = open(path).read().replace(current_version_string, updated_version_string)
-            with open(path, "w+") as f: f.write(content)
+        sp.check_call(["mvn", "versions:set", "-DnewVersion="+updated_version, "-DoldVersion=*", "-DgroupId=*", "-DartifactId=*"], cwd = "matsim")
+#        for path in glob.iglob("matsim/**/pom.xml", recursive = True):
+#            print("Rewriting ", path, "...")
+#            content = open(path).read().replace(current_version_string, updated_version_string)
+#            with open(path, "w+") as f: f.write(content)
 
         # This part can be changed later, when this moves to the official MATSim bintray
 #         print("Rewriting Bintray URLs...")
