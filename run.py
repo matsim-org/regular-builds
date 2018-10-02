@@ -93,7 +93,7 @@ if not current_date == last_release_date:
             sp.check_call([
                 "mvn", "install", "--batch-mode", "--fail-at-end",
                 "-Dmaven.test.redirectTestOutputToFile",
-                "-Dmatsim.preferLocalDtds=true"], cwd = "matsim")
+                "-Dmatsim.preferLocalDtds=true"], cwd = "matsim/%s" % item)
 
         print("Deploying maven artifacts ...")
         for item in DEPLOY_ITEMS:
