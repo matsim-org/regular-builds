@@ -100,8 +100,6 @@ if not current_date == last_release_date:
             sp.check_call([
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
                 "--settings", "../../settings.xml",
-                "-Dmaven.test.redirectTestOutputToFile",
-                "-Dmatsim.preferLocalDtds=true",
                 "-DskipTests=true"], cwd = "matsim/%s" % item)
 
         print("Publishing artifacts ...")
