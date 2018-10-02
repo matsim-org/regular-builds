@@ -8,7 +8,7 @@ INTERNAL_DATE_FORMAT = "%Yw%W"
 VERSION_PATTERN = r"<version>(.*)</version>"
 
 INSTALL_ITEMS = ("examples", "matsim", "benchmark")
-DEPLOY_ITEMS = ("matsim")
+DEPLOY_ITEMS = ("matsim", ) # do not delete that dangling comma or it will not work
 
 # Default values
 state = {
@@ -106,7 +106,7 @@ if not current_date == last_release_date:
         result = requests.post("https://api.bintray.com/content/matsim/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
 
         if not result.status_code == 200:
-            raise RuntimeError("Problem publishing the package")
+            raise RuntimeError("Problem publishing the package " + str(result.status_code))
 
         with open("state.json", "w+") as f:
             state["last_release_commit"] = current_commit
