@@ -7,8 +7,8 @@ BINTRAY_PASSWORD = os.environ["BINTRAY_PASSWORD"]
 INTERNAL_DATE_FORMAT = "%Yw%W"
 VERSION_PATTERN = r"<version>(.*)</version>"
 
-INSTALL_ITEMS = ("examples", "matsim", "contribs", "benchmark")
-DEPLOY_ITEMS = ("matsim", "contribs")
+INSTALL_ITEMS = ("examples", "matsim", "benchmark")
+DEPLOY_ITEMS = ("matsim")
 
 # Default values
 state = {
