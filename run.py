@@ -58,7 +58,7 @@ if not current_date == last_release_date:
         print("Current commit is:", current_commit)
 
         bintray_auth = requests.auth.HTTPBasicAuth(BINTRAY_USER, BINTRAY_PASSWORD)
-        result = requests.get("https://api.bintray.com/packages/matsim/matsim/matsim") #, auth = bintray_auth)
+        result = requests.get("https://api.bintray.com/packages/matsim/matsim/matsim", auth = bintray_auth)
 
         if not result.status_code == 200:
             raise RuntimeError("Could not get informaton from Bintray " + str(result.status_code))
