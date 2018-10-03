@@ -7,8 +7,8 @@ BINTRAY_PASSWORD = os.environ["BINTRAY_PASSWORD"]
 INTERNAL_DATE_FORMAT = "%Yw%W"
 VERSION_PATTERN = r"<version>(.*)</version>"
 
-INSTALL_ITEMS = ("examples", "matsim", "benchmark")
-DEPLOY_ITEMS = ("matsim", ) # do not delete that dangling comma or it will not work
+INSTALL_ITEMS = ("examples", "matsim", "contribs", "benchmark")
+DEPLOY_ITEMS = ("matsim", "contribs", ) # do not delete that dangling comma or it will not work if there's only one entry
 
 # Default values
 state = {
@@ -72,21 +72,6 @@ if not current_date == last_release_date:
             raise RuntimeError("Bintray already has the proposed release")
 
         sp.check_call(["mvn", "versions:set", "-DnewVersion="+updated_version, "-DoldVersion=*", "-DgroupId=*", "-DartifactId=*"], cwd = "matsim")
-#        for path in glob.iglob("matsim/**/pom.xml", recursive = True):
-#            print("Rewriting ", path, "...")
-#            content = open(path).read().replace(current_version_string, updated_version_string)
-#            with open(path, "w+") as f: f.write(content)
-
-        # This part can be changed later, when this moves to the official MATSim bintray
-#         print("Rewriting Bintray URLs...")
-
-#         content = open("matsim/matsim/pom.xml").read()
-#         content = content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
-#         with open("matsim/matsim/pom.xml", "w+") as f: f.write(content)
-
-#         content = open("matsim/contribs/pom.xml").read()
-#         content = content.replace("https://api.bintray.com/maven/matsim/matsim/matsim", "https://api.bintray.com/maven/matsim-eth/matsim/matsim/")
-#         with open("matsim/contribs/pom.xml", "w+") as f: f.write(content)
 
         print("Installing maven artifacts ...")
         for item in INSTALL_ITEMS:
