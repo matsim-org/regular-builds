@@ -48,7 +48,7 @@ if not current_date == last_release_date:
         if not current_version.endswith("-SNAPSHOT"):
             raise RuntimeError("The commit checked out from gitlab does not include a SNAPSHOT version!")
 
-        updated_version = current_version.replace("-SNAPSHOT", "-" + current_date)
+        updated_version = current_version.replace("-SNAPSHOT", "-" + current_date + "-SNAPSHOT")
 
         current_version_string = "<version>%s</version>" % current_version
         updated_version_string = "<version>%s</version>" % updated_version
@@ -87,11 +87,11 @@ if not current_date == last_release_date:
                 "--settings", "../../settings.xml",
                 "-DskipTests=true"], cwd = "matsim/%s" % item)
 
-        print("Publishing artifacts ...")
-        result = requests.post("https://api.bintray.com/content/matsim/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
+#        print("Publishing artifacts ...")
+#        result = requests.post("https://api.bintray.com/content/matsim/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
 
-        if not result.status_code == 200:
-            raise RuntimeError("Problem publishing the package " + str(result.status_code))
+#        if not result.status_code == 200:
+#            raise RuntimeError("Problem publishing the package " + str(result.status_code))
 
         with open("state.json", "w+") as f:
             state["last_release_commit"] = current_commit
