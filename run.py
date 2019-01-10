@@ -48,7 +48,7 @@ if not current_date == last_release_date:
         if not current_version.endswith("-SNAPSHOT"):
             raise RuntimeError("The commit checked out from gitlab does not include a SNAPSHOT version!")
 
-        updated_version = current_version.replace("-SNAPSHOT", "." + current_date + "-SNAPSHOT")
+        updated_version = current_version.replace("-SNAPSHOT", "-" + current_date + "-SNAPSHOT")
 
         current_version_string = "<version>%s</version>" % current_version
         updated_version_string = "<version>%s</version>" % updated_version
