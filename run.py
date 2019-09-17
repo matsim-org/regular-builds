@@ -8,7 +8,7 @@ INTERNAL_DATE_FORMAT = "%Yw%W"
 VERSION_PATTERN = r"<version>(.*)</version>"
 
 INSTALL_ITEMS = ("examples", "matsim", "contribs", "benchmark")
-DEPLOY_ITEMS = ("matsim", "contribs", ) # do not delete that dangling comma or it will not work if there's only one entry
+DEPLOY_ITEMS = ("examples", "matsim", "contribs", ) # do not delete that dangling comma or it will not work if there's only one entry
 
 # Default values
 state = {
