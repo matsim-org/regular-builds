@@ -27,10 +27,12 @@ if os.path.exists("matsim"):
     shutil.rmtree("matsim")
 
 # Clone MATSim
-sp.check_call(["git", "clone", "--depth", "1", "https://github.com/matsim-org/matsim.git"])
+sp.check_call(["git", "clone", "--depth", "1", "https://github.com/matsim-org/matsim-libs.git"])
 
 # Find current commit
 current_commit = sp.check_output(["git", "rev-parse", "HEAD"], cwd = "matsim").decode("utf-8").strip()
+
+print("Current commit is:", current_commit)
 
 last_release_date = datetime.datetime.strptime(state["last_release_date"], INTERNAL_DATE_FORMAT)
 current_date = datetime.datetime.today().strftime(INTERNAL_DATE_FORMAT)
