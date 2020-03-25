@@ -22,15 +22,15 @@ if os.path.exists("state.json"):
         state.update(json.load(f))
 
 # Clean up MATSim
-if os.path.exists("matsim"):
+if os.path.exists("matsim-libs"):
     print("Deleting old checkout ...")
-    shutil.rmtree("matsim")
+    shutil.rmtree("matsim-libs")
 
 # Clone MATSim
 sp.check_call(["git", "clone", "--depth", "1", "https://github.com/matsim-org/matsim-libs.git"])
 
 # Find current commit
-current_commit = sp.check_output(["git", "rev-parse", "HEAD"], cwd = "matsim").decode("utf-8").strip()
+current_commit = sp.check_output(["git", "rev-parse", "HEAD"], cwd = "matsim-libs").decode("utf-8").strip()
 
 print("Current commit is:", current_commit)
 
@@ -43,7 +43,7 @@ if not current_date == last_release_date:
     if not current_commit == state["last_release_commit"]:
         # At this point a new release is requested
 
-        with open("matsim/pom.xml") as f:
+        with open("matsim-libs/pom.xml") as f:
             match = re.search(VERSION_PATTERN, f.read())
             current_version = match.group(1)
 
@@ -73,21 +73,21 @@ if not current_date == last_release_date:
         if updated_version in result["versions"]:
             raise RuntimeError("Bintray already has the proposed release")
 
-        sp.check_call(["mvn", "versions:set", "-DnewVersion="+updated_version, "-DoldVersion=*", "-DgroupId=*", "-DartifactId=*"], cwd = "matsim")
+        sp.check_call(["mvn", "versions:set", "-DnewVersion="+updated_version, "-DoldVersion=*", "-DgroupId=*", "-DartifactId=*"], cwd = "matsim-libs")
 
         print("Installing maven artifacts ...")
         for item in INSTALL_ITEMS:
             sp.check_call([
                 "mvn", "install", "--batch-mode", "--fail-at-end",
                 "-Dmaven.test.redirectTestOutputToFile",
-                "-Dmatsim.preferLocalDtds=true"], cwd = "matsim/%s" % item)
+                "-Dmatsim.preferLocalDtds=true"], cwd = "matsim-libs/%s" % item)
 
         print("Deploying maven artifacts ...")
         for item in DEPLOY_ITEMS:
             sp.check_call([
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
                 "--settings", "../../settings.xml",
-                "-DskipTests=true"], cwd = "matsim/%s" % item)
+                "-DskipTests=true"], cwd = "matsim-libs/%s" % item)
 
 #        print("Publishing artifacts ...")
 #        result = requests.post("https://api.bintray.com/content/matsim/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
