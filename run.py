@@ -76,11 +76,10 @@ if not current_date == last_release_date:
         sp.check_call(["mvn", "versions:set", "-DnewVersion="+updated_version, "-DoldVersion=*", "-DgroupId=*", "-DartifactId=*"], cwd = "matsim-libs")
 
         print("Installing maven artifacts ...")
-        for item in INSTALL_ITEMS:
-            sp.check_call([
-                "mvn", "install", "--batch-mode", "--fail-at-end",
-                "-Dmaven.test.redirectTestOutputToFile",
-                "-Dmatsim.preferLocalDtds=true"], cwd = "matsim-libs/%s" % item)
+		sp.check_call([
+			"mvn", "install", "--batch-mode", "--fail-at-end",
+			"-Dmaven.test.redirectTestOutputToFile",
+			"-Dmatsim.preferLocalDtds=true"], cwd = "matsim-libs")
 
         print("Deploying maven artifacts ...")
         for item in DEPLOY_ITEMS:
