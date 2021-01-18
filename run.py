@@ -7,7 +7,6 @@ BINTRAY_PASSWORD = os.environ["BINTRAY_PASSWORD"]
 INTERNAL_DATE_FORMAT = "%Yw%W"
 VERSION_PATTERN = r"<version>(.*)</version>"
 
-INSTALL_ITEMS = ("examples", "matsim", "contribs", "benchmark")
 DEPLOY_ITEMS = ("examples", "matsim", "contribs", ) # do not delete that dangling comma or it will not work if there's only one entry
 
 # Default values
@@ -82,6 +81,12 @@ if not current_date == last_release_date:
             "-Dmatsim.preferLocalDtds=true"], cwd = "matsim-libs")
 
         print("Deploying maven artifacts ...")
+        # deploy non-recursively the parent project
+        sp.check_call([
+            "mvn", "deploy", "--batch-mode", "--fail-at-end",
+            "--settings", "../../settings.xml",
+            "-DskipTests=true", "--non-recursive"], cwd = "matsim-libs")
+        # deploy selected sub-projects
         for item in DEPLOY_ITEMS:
             sp.check_call([
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
