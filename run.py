@@ -84,13 +84,13 @@ if not current_date == last_release_date:
         # deploy non-recursively the parent project
         sp.check_call([
             "mvn", "deploy", "--batch-mode", "--fail-at-end",
-            "--settings", "./settings.xml",
+            "--settings", "../settings.xml",
             "-DskipTests=true", "--non-recursive"], cwd = "matsim-libs")
         # deploy selected sub-projects
         for item in DEPLOY_ITEMS:
             sp.check_call([
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
-                "--settings", "./settings.xml",
+                "--settings", "../../settings.xml",
                 "-DskipTests=true"], cwd = "matsim-libs/%s" % item)
 
 #        print("Publishing artifacts ...")
