@@ -1,9 +1,6 @@
 import shutil, os.path, json, datetime, re, glob, requests, os
 import subprocess as sp
 
-BINTRAY_USER = os.environ["BINTRAY_USER"]
-BINTRAY_PASSWORD = os.environ["BINTRAY_PASSWORD"]
-
 INTERNAL_DATE_FORMAT = "%Yw%W"
 VERSION_PATTERN = r"<version>(.*)</version>"
 
@@ -58,19 +55,12 @@ if not current_date == last_release_date:
         print("Updated version is:", updated_version)
         print("Current commit is:", current_commit)
 
-        bintray_auth = requests.auth.HTTPBasicAuth(BINTRAY_USER, BINTRAY_PASSWORD)
-        result = requests.get("https://api.bintray.com/packages/matsim/matsim/matsim", auth = bintray_auth)
+        # check URL in following form: https://repo.matsim.org/repository/matsim/org/matsim/matsim/13.0/matsim-13.0.jar.md5
+        # check for the .md5 file as this is known to be small, in the case it already exists
+        result = requests.get("https://repo.matsim.org/repository/matsim/org/matsim/matsim/" + updated_version + "/matsim-" + updated_version + ".jar.md5"")
 
-        if not result.status_code == 200:
-            raise RuntimeError("Could not get informaton from Bintray " + str(result.status_code))
-
-        result = result.json()
-
-        if not "versions" in result:
-            raise RuntimeError("Did not understand Bintray response")
-
-        if updated_version in result["versions"]:
-            raise RuntimeError("Bintray already has the proposed release")
+        if not result.status_code == 404:
+            raise RuntimeError("Version already exists or could not get informaton from Maven repository " + str(result.status_code))
 
         sp.check_call(["mvn", "versions:set", "-DnewVersion="+updated_version, "-DoldVersion=*", "-DgroupId=*", "-DartifactId=*"], cwd = "matsim-libs")
 
@@ -92,12 +82,6 @@ if not current_date == last_release_date:
                 "mvn", "deploy", "--batch-mode", "--fail-at-end",
                 "--settings", "../../settings.xml",
                 "-DskipTests=true"], cwd = "matsim-libs/%s" % item)
-
-#        print("Publishing artifacts ...")
-#        result = requests.post("https://api.bintray.com/content/matsim/matsim/matsim/%s/publish" % updated_version, auth = bintray_auth)
-
-#        if not result.status_code == 200:
-#            raise RuntimeError("Problem publishing the package " + str(result.status_code))
 
         with open("state.json", "w+") as f:
             state["last_release_commit"] = current_commit
