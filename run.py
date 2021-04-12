@@ -57,7 +57,7 @@ if not current_date == last_release_date:
 
         # check URL in following form: https://repo.matsim.org/repository/matsim/org/matsim/matsim/13.0/matsim-13.0.jar.md5
         # check for the .md5 file as this is known to be small, in the case it already exists
-        result = requests.get("https://repo.matsim.org/repository/matsim/org/matsim/matsim/" + updated_version + "/matsim-" + updated_version + ".jar.md5"")
+        result = requests.get("https://repo.matsim.org/repository/matsim/org/matsim/matsim/" + updated_version + "/matsim-" + updated_version + ".jar.md5")
 
         if not result.status_code == 404:
             raise RuntimeError("Version already exists or could not get informaton from Maven repository " + str(result.status_code))
