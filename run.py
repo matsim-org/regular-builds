@@ -44,16 +44,16 @@ if not current_date == last_release_date:
             current_version = match.group(1)
 
         if not current_version.endswith("-SNAPSHOT"):
-            raise RuntimeError("The commit checked out from gitlab does not include a SNAPSHOT version!")
+            raise RuntimeError("The commit checked out from github does not include a SNAPSHOT version!")
 
-        updated_version = current_version.replace("-SNAPSHOT", "-" + current_date + "-SNAPSHOT")
+        updated_version = current_version.replace("-SNAPSHOT", "-" + current_date)
 
         current_version_string = "<version>%s</version>" % current_version
         updated_version_string = "<version>%s</version>" % updated_version
 
         print("SNAPSHOT version is:", current_version)
-        print("Updated version is:", updated_version)
-        print("Current commit is:", current_commit)
+        print("Updated (weekly) version is:", updated_version)
+        print("Current commit is:", current_commit, flush=True)
 
         # check URL in following form: https://repo.matsim.org/repository/matsim/org/matsim/matsim/13.0/matsim-13.0.jar.md5
         # check for the .md5 file as this is known to be small, in the case it already exists
@@ -64,13 +64,13 @@ if not current_date == last_release_date:
 
         sp.check_call(["mvn", "versions:set", "-DnewVersion="+updated_version, "-DoldVersion=*", "-DgroupId=*", "-DartifactId=*"], cwd = "matsim-libs")
 
-        print("Installing maven artifacts ...")
+        print("Installing maven artifacts ...", flush=True)
         sp.check_call([
             "mvn", "install", "--batch-mode", "--fail-at-end",
             "-Dmaven.test.redirectTestOutputToFile",
             "-Dmatsim.preferLocalDtds=true"], cwd = "matsim-libs")
 
-        print("Deploying maven artifacts ...")
+        print("Deploying maven artifacts ...", flush=True)
         # deploy non-recursively the parent project
         sp.check_call([
             "mvn", "deploy", "--batch-mode", "--fail-at-end",
